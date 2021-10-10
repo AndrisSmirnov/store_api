@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  store:
+    build:
+      context: ./store
+      dockerfile: Dockerfile
+    volumes:
+      - ./store:/usr/src/app
+    command: fresh
+    ports:
+      - 8080:8080
+    depends_on:
+      - db-store
+      - redis-store
+    working_dir: /usr/src/app
+    restart: unless-stopped
+  db-store:
+    image: postgres
+    restart: always
+    ports:
+      - 5435:5432
+    depends_on:
+      - db-store
+      - redis-store
+    environment:
+      - POSTGRES_PASSWORD=password
+      - PGDATA=/var/lib/postgres/data/pgtada
+    volumes:
+      - /var/www/dbdata-wr:/var/lib/postgressql/data
+
+  redis-store:
+    image: redis:6.0
+    ports:
+      - 6379:6379
